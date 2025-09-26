@@ -1,0 +1,30 @@
+name: Auto Commit 50-100 Times
+
+on:
+  schedule:
+    # Run every 15 minutes (≈ 96 times/day)
+    - cron: "*/15 * * * *"
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Generate random commits
+        run: |
+          # Pick a random number between 50–100
+          COUNT=$((RANDOM % 51 + 50))
+          echo "Will make $COUNT commits today" 
+          
+          for i in $(seq 1 $COUNT); do
+            echo "Commit number $i at $(date)" >> commits.txt
+            git config user.name "GitHub Bot"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add commits.txt
+            git commit -m "Automated commit #$i on $(date)"
+          done
+          git push
